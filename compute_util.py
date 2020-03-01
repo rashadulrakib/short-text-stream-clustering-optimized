@@ -2,6 +2,23 @@ from sent_vecgenerator import generate_sent_vecs_toktextdata
 from scipy.spatial import distance
 import sys
 
+def computeSimBtnList(txtIndsi, txtIndsj):
+  if len(txtIndsj)<len(txtIndsi):
+    temp=txtIndsj
+    txtIndsj=txtIndsi
+    txtIndsi=temp 
+
+  common=0   
+  for ind in txtIndsi:
+    if ind in txtIndsj:
+      common=common+1
+	  
+  return 2*common/(len(txtIndsi)+len(txtIndsj))	  
+	  
+	
+  
+
+
 def findCloseCluster_GramKey_lexical(keys_list, word_arr, minMatch):
   closeKey_Lexical=None
   maxCommonLength=0
@@ -11,9 +28,7 @@ def findCloseCluster_GramKey_lexical(keys_list, word_arr, minMatch):
     set2=set(word_arr)
     common=set1.intersection(set2)
     if len(common)>=minMatch and len(common)>maxCommonLength:
-      maxCommonLength=len(common)
-      #arr =list(common)
-      #arr.sort()	  
+      maxCommonLength=len(common)	  
       closeKey_Lexical=key	  
   
   return closeKey_Lexical

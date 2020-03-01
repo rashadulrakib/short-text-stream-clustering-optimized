@@ -3,6 +3,98 @@ from collections import Counter
 import numpy as np
 from compute_util import findCloseCluster_GramKey_lexical
 from compute_util import findCloseCluster_GramKey_Semantic
+from compute_util import computeSimBtnList
+
+def mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, simThreshold=0.8):
+  new_dic_bitri_keys_selectedClusters_seenBatch={}
+  keys_list=list(dic_bitri_keys_selectedClusters_seenBatch.keys())
+  
+  dic_usedKey_to_maxSim={}
+  
+  for i in range(0, len(keys_list)):
+       
+    max_sim=0
+    max_j=-1	
+    if keys_list[i] in dic_usedKey_to_maxSim:
+      continue	
+    for j in range(0, len(keys_list)):
+ 	
+      if i==j or keys_list[j] in dic_usedKey_to_maxSim:
+        continue	
+      txtIndsi=	dic_bitri_keys_selectedClusters_seenBatch[keys_list[i]]
+      txtIndsj=	dic_bitri_keys_selectedClusters_seenBatch[keys_list[j]]
+      sim=computeSimBtnList(txtIndsi, txtIndsj)
+      if sim >= simThreshold and sim> max_sim:
+        max_sim=sim
+        max_j=j
+		
+    if max_j>-1 and keys_list[max_j] not in dic_usedKey_to_maxSim:	
+      dic_usedKey_to_maxSim[keys_list[i]]=max_sim
+      dic_usedKey_to_maxSim[keys_list[max_j]]=max_sim
+      txtIndsi=	dic_bitri_keys_selectedClusters_seenBatch[keys_list[i]]
+      txtIndsj=	dic_bitri_keys_selectedClusters_seenBatch[keys_list[max_j]]	  
+      #select key (i,j) based on the size of (txtinds)
+      print("new_dic_bitri_keys_selectedClusters_seenBatch", keys_list[i], keys_list[max_j])	  
+      new_dic_bitri_keys_selectedClusters_seenBatch[keys_list[i]]=list(set(txtIndsi+txtIndsj))	  
+		
+      	  
+  return new_dic_bitri_keys_selectedClusters_seenBatch
+  
+def mergeByCommonWords(dic_biGram_to_textInds, dic_triGram_to_textInds, dic_bitri_keys_selectedClusters_seenBatch, minCommomGram, t_minSize, t_maxSize, b_minSize, b_maxSize):
+  new_dic_bitri_keys_selectedClusters_seenBatch={}
+  
+  keys_list=dic_bitri_keys_selectedClusters_seenBatch.keys()
+  for key, txtInds in dic_triGram_to_textInds.items():
+    #try the key to merge with big dic  
+	#if can not merge with big dic, then add the key to the big dic
+    txtInds=list(set(txtInds))
+     	
+    gram_clusterSize=len(txtInds)
+    if gram_clusterSize<=t_minSize:
+      continue	
+    #keys_list=dic_bitri_keys_selectedClusters_seenBatch.keys()
+    word_arr=key.split(' ')	
+    closeKey_Lexical=findCloseCluster_GramKey_lexical(keys_list,word_arr,2)
+    if closeKey_Lexical==None:
+      closeKey_Lexical=key	
+      dic_bitri_keys_selectedClusters_seenBatch[key]=list(set(txtInds))
+    else:
+      dic_bitri_keys_selectedClusters_seenBatch[closeKey_Lexical]=list(set(dic_bitri_keys_selectedClusters_seenBatch[closeKey_Lexical]+txtInds))
+	  
+    if len(dic_bitri_keys_selectedClusters_seenBatch[closeKey_Lexical])<=t_minSize:
+      del dic_bitri_keys_selectedClusters_seenBatch[closeKey_Lexical]
+      continue	  
+	  
+    #print(closeKey_Lexical, dic_bitri_keys_selectedClusters_seenBatch[closeKey_Lexical])	  
+  
+  
+  keys_list=dic_bitri_keys_selectedClusters_seenBatch.keys()
+  for key, txtInds in dic_biGram_to_textInds.items():
+    #try the key to merge with big dic  
+	#if can not merge with big dic, then add the key to the big dic
+    txtInds=list(set(txtInds))
+
+    gram_clusterSize=len(txtInds)
+    if gram_clusterSize<=b_minSize:
+      continue	
+    #keys_list=dic_bitri_keys_selectedClusters_seenBatch.keys()
+    word_arr=key.split(' ')	
+    closeKey_Lexical=findCloseCluster_GramKey_lexical(keys_list,word_arr,2)
+    if closeKey_Lexical==None:	
+      closeKey_Lexical=key	
+      dic_bitri_keys_selectedClusters_seenBatch[key]=list(set(txtInds))
+    else:
+      dic_bitri_keys_selectedClusters_seenBatch[closeKey_Lexical]=list(set(dic_bitri_keys_selectedClusters_seenBatch[closeKey_Lexical]+txtInds))
+	  
+    if len(dic_bitri_keys_selectedClusters_seenBatch[closeKey_Lexical])<=b_minSize:
+      del dic_bitri_keys_selectedClusters_seenBatch[closeKey_Lexical]
+      continue
+
+    #print(closeKey_Lexical, dic_bitri_keys_selectedClusters_seenBatch[closeKey_Lexical])	  
+	  
+  new_dic_bitri_keys_selectedClusters_seenBatch=dic_bitri_keys_selectedClusters_seenBatch	  
+  
+  return new_dic_bitri_keys_selectedClusters_seenBatch
 
 def assignToClusterBySimilarity(not_clustered_inds_seen_batch, seen_list_pred_true_words_index, dic_combined_keys_selectedClusters, wordVectorsDic):
   new_not_clustered_inds_seen_batch=[]

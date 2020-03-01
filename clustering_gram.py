@@ -1,23 +1,28 @@
 from txt_process_util import concatWordsSort
+from txt_process_util import createTerm_Doc_matrix_dic
 
 from collections import Counter
 from clustering_gram_util import populateNgramStatistics
-from clustering_gram_util import clusterByNgram
-from clustering_gram_util import mergeGroups
-from clustering_gram_util import extractNotClusteredItems
-from clustering_gram_util import assignToMergedClusters
-from clustering_gram_util import mergeWithPrevBatch
+#from clustering_gram_util import clusterByNgram
+#from clustering_gram_util import mergeGroups
+#from clustering_gram_util import extractNotClusteredItems
+#from clustering_gram_util import assignToMergedClusters
+#from clustering_gram_util import mergeWithPrevBatch
+from clustering_gram_util import mergeByCommonWords
+from clustering_gram_util import mergeByCommonTextInds
 
-def cluster_gram_freq(list_pred_true_words_index, batchNo, dictri_keys_selectedClusters_prevBatch={}, dicbi_keys_selectedClusters_prevBatch={}, not_clustered_inds_prevBatch=[], seen_list_pred_true_words_index=[]):
+#from clustering_util import clusterByHdbscan
+
+def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_selectedClusters_seenBatch={}, not_clustered_inds_seen_batch=[], seen_list_pred_true_words_index=[]):
   dic_uniGram_to_textInds={}
   dic_biGram_to_textInds={}
   dic_triGram_to_textInds={}
   uni_std_csize_offset=50000
   bi_std_csize_offset=1000000
   tri_std_csize_offset=100000  
-  i=-1
+  
   for pred_true_words_index in list_pred_true_words_index:
-    i+=1
+    
     words=pred_true_words_index[2]
     org_ind_i=pred_true_words_index[3]	
     for j in range(len(words)):
@@ -29,9 +34,21 @@ def cluster_gram_freq(list_pred_true_words_index, batchNo, dictri_keys_selectedC
 
   uni_std,uni_mean,uni_max,uni_min=populateNgramStatistics(dic_uniGram_to_textInds, 1)
   bi_std,bi_mean,bi_max,bi_min=populateNgramStatistics(dic_biGram_to_textInds, 1)
-  tri_std,tri_mean,tri_max,tri_min=populateNgramStatistics(dic_triGram_to_textInds, 1)  
+  tri_std,tri_mean,tri_max,tri_min=populateNgramStatistics(dic_triGram_to_textInds, 1)
   
-  dic_used_textIds={}
+  dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonWords(dic_biGram_to_textInds, dic_triGram_to_textInds, dic_bitri_keys_selectedClusters_seenBatch, 2, tri_mean+tri_std, tri_mean+tri_std+tri_std_csize_offset, bi_mean+bi_std, bi_mean+bi_std+bi_std_csize_offset)
+  
+  #####dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, 0.5)
+  
+  term_doc_matrix=createTerm_Doc_matrix_dic(dic_bitri_keys_selectedClusters_seenBatch)
+  #####dic_bitri_keys_selectedClusters_seenBatch=clusterByHdbscan(dic_bitri_keys_selectedClusters_seenBatch, 10)
+ 
+  new_not_clustered_inds_seen_batch=[]
+  new_dic_bitri_keys_selectedClusters_seenBatch=dic_bitri_keys_selectedClusters_seenBatch
+  
+  
+  return [new_not_clustered_inds_seen_batch, new_dic_bitri_keys_selectedClusters_seenBatch]
+  '''dic_used_textIds={}
   dic_used_textIds, max_group_sum_tri, texts_clustered_by_tri, dictri_keys_selectedClusters=clusterByNgram(dic_triGram_to_textInds,tri_mean, tri_mean+tri_std+tri_std_csize_offset, dic_used_textIds, list_pred_true_words_index, seen_list_pred_true_words_index)
   
   dic_used_textIds, max_group_sum_bi, texts_clustered_by_bi, dicbi_keys_selectedClusters=clusterByNgram(dic_biGram_to_textInds, bi_mean+bi_std, bi_mean+bi_std+bi_std_csize_offset, dic_used_textIds, list_pred_true_words_index, seen_list_pred_true_words_index)
@@ -61,7 +78,7 @@ def cluster_gram_freq(list_pred_true_words_index, batchNo, dictri_keys_selectedC
   #new_dicBiMerged_keys_selectedClusters, not_clustered_inds_bi=assignToMergedClusters(list_pred_true_words_index, not_clustered_inds_tri, dicbi_keys_selectedClusters, 2)
   
   return [new_dicTriMerged_keys_selectedClusters, dicbi_keys_selectedClusters, not_clustered_inds_tri]
-  #return [dictri_keys_selectedClusters_batch, ]
+  #return [dictri_keys_selectedClusters_batch, ]'''
     
   
     
