@@ -13,6 +13,22 @@ from clustering_gram_util import mergeByCommonTextInds
 
 #from clustering_util import clusterByHdbscan
 
+import hdbscan
+
+
+def transpose(l1, l2): 
+  
+    # iterate over list l1 to the length of an item  
+    for i in range(len(l1[0])): 
+        # print(i) 
+        row =[] 
+        for item in l1: 
+            # appending to new list with values and index positions 
+            # i contains index position and item contains values 
+            row.append(item[i]) 
+        l2.append(row) 
+    return l2 
+
 def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_selectedClusters_seenBatch={}, not_clustered_inds_seen_batch=[], seen_list_pred_true_words_index=[]):
   dic_uniGram_to_textInds={}
   dic_biGram_to_textInds={}
@@ -41,6 +57,13 @@ def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_select
   #####dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, 0.5)
   
   term_doc_matrix=createTerm_Doc_matrix_dic(dic_bitri_keys_selectedClusters_seenBatch)
+  l2 = [] 
+  l2=transpose(term_doc_matrix, l2) 
+  clusterer = hdbscan.HDBSCAN()
+  clusterer.fit(l2)
+  #clusterer.labels_
+  clusterer.labels_.max()
+  print("hdbscan", len(clusterer.labels_), clusterer.labels_.max(), clusterer.labels_)
   #####dic_bitri_keys_selectedClusters_seenBatch=clusterByHdbscan(dic_bitri_keys_selectedClusters_seenBatch, 10)
  
   new_not_clustered_inds_seen_batch=[]
