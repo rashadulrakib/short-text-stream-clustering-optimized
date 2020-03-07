@@ -43,6 +43,17 @@ def mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, simThreshol
         continue	
       txtIndsi=	dic_bitri_keys_selectedClusters_seenBatch[keys_list[i]]
       txtIndsj=	dic_bitri_keys_selectedClusters_seenBatch[keys_list[j]]
+	 
+      #--------if txtIndsi is the subset of txtIndsj
+      z = set(txtIndsi).intersection(set(txtIndsj))
+      if len(z)==len(set(txtIndsi)) or len(z)==len(set(txtIndsj)):
+        dic_usedKey_to_maxSim[keys_list[i]]=max_sim
+        dic_usedKey_to_maxSim[keys_list[j]]=max_sim
+        new_dic_bitri_keys_selectedClusters_seenBatch[keys_list[i]]=list(set(txtIndsi+txtIndsj))
+        continue			  
+      #--------end if txtIndsi is the subset of txtIndsj	  
+	  
+	  
       sim=computeSimBtnList(txtIndsi, txtIndsj)
       if sim >= simThreshold and sim> max_sim:
         max_sim=sim
