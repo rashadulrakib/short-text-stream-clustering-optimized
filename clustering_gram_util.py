@@ -5,6 +5,26 @@ from compute_util import findCloseCluster_GramKey_lexical
 from compute_util import findCloseCluster_GramKey_Semantic
 from compute_util import computeSimBtnList
 
+def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
+  dic_txtId_to_grams={}
+  new_dic_bitri_keys_selectedClusters_seenBatch={}
+  not_clustered_inds_seen_batch=[]
+  #------sort dic_bitri_keys_selectedClusters_seenBatch by no of values in key.
+  #------remove duplicate txtInd from large clusters
+  sortedKeys=sorted(dic_bitri_keys_selectedClusters_seenBatch, key = lambda key: len(dic_bitri_keys_selectedClusters_seenBatch[key]))
+
+  for key in sortedKeys:
+    #print("sorted", key, len(dic_bitri_keys_selectedClusters_seenBatch[key]), dic_bitri_keys_selectedClusters_seenBatch[key])
+    txtInds= dic_bitri_keys_selectedClusters_seenBatch[key]
+    for txtInd in txtInds:
+      dic_txtId_to_grams.setdefault(txtInd, []).append(key)
+
+  for txtInd, grams in dic_txtId_to_grams.items():
+    print("sorted", txtInd, grams)  
+       
+    
+  return [dic_bitri_keys_selectedClusters_seenBatch, not_clustered_inds_seen_batch] #temporary	  
+
 def mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, simThreshold=0.8):
   new_dic_bitri_keys_selectedClusters_seenBatch={}
   keys_list=list(dic_bitri_keys_selectedClusters_seenBatch.keys())
@@ -34,7 +54,7 @@ def mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, simThreshol
       txtIndsi=	dic_bitri_keys_selectedClusters_seenBatch[keys_list[i]]
       txtIndsj=	dic_bitri_keys_selectedClusters_seenBatch[keys_list[max_j]]	  
       #select key (i,j) based on the size of (txtinds)
-      print("new_dic_bitri_keys_selectedClusters_seenBatch", keys_list[i], keys_list[max_j])	  
+      print("mergeByCommonTextInds", keys_list[i], ",", keys_list[max_j])	  
       new_dic_bitri_keys_selectedClusters_seenBatch[keys_list[i]]=list(set(txtIndsi+txtIndsj))	  
 		
       	  
