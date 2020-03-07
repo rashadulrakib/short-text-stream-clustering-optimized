@@ -438,7 +438,7 @@ def clusterByNgram(dic_gram_to_textInds, minSize, maxSize, dic_used_textIds, lis
 	
   return [dic_used_textIds, max_group_sum_gram, texts_clustered_by_gram, dicgram_keys_selectedNonEmptyClusters]	
 
-def populateNgramStatistics(dic_gram_to_textInds, minTxtIndsForNgram):
+def populateNgramStatistics(dic_gram_to_textInds, minTxtIndsForNgram=1):
   ordered_keys_gram_to_textInds = sorted(dic_gram_to_textInds, key = lambda key: len(dic_gram_to_textInds[key]))
   txtIndsSize=[]
   for key in ordered_keys_gram_to_textInds:

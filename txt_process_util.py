@@ -56,7 +56,7 @@ def createTerm_Doc_matrix_dic(dic_bitri_keys_selectedClusters_seenBatch):
      term_doc_matrix[rowId][colId]=1
 
   #print(term_doc_matrix)
-  return term_doc_matrix	 
+  return [term_doc_matrix, dic_txt_index]	 
 	
   
     

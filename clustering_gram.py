@@ -12,6 +12,7 @@ from clustering_gram_util import mergeByCommonWords
 from clustering_gram_util import mergeByCommonTextInds
 
 #from clustering_util import clusterByHdbscan
+from evaluation import Evaluate
 
 import hdbscan
 
@@ -54,17 +55,31 @@ def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_select
   
   dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonWords(dic_biGram_to_textInds, dic_triGram_to_textInds, dic_bitri_keys_selectedClusters_seenBatch, 2, tri_mean+tri_std, tri_mean+tri_std+tri_std_csize_offset, bi_mean+bi_std, bi_mean+bi_std+bi_std_csize_offset)
   
-  #####dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, 0.5)
+  dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, 0.1)
   
-  term_doc_matrix=createTerm_Doc_matrix_dic(dic_bitri_keys_selectedClusters_seenBatch)
+  
+  '''#-----temp hdbscan---------------
+  term_doc_matrix, dic_txt_index=createTerm_Doc_matrix_dic(dic_bitri_keys_selectedClusters_seenBatch)
   l2 = [] 
   l2=transpose(term_doc_matrix, l2) 
   clusterer = hdbscan.HDBSCAN()
   clusterer.fit(l2)
-  #clusterer.labels_
-  clusterer.labels_.max()
-  print("hdbscan", len(clusterer.labels_), clusterer.labels_.max(), clusterer.labels_)
-  #####dic_bitri_keys_selectedClusters_seenBatch=clusterByHdbscan(dic_bitri_keys_selectedClusters_seenBatch, 10)
+  print(clusterer.labels_)
+  print("before transpose", len(term_doc_matrix), "after", len(l2))
+  print("hdbscan", len(clusterer.labels_), clusterer.labels_.max())
+  
+  list_temp_eval=[]
+  
+  for global_txtInd, matrixTxtIndex in dic_txt_index.items():
+    matrixTxtIndex=matrixTxtIndex-len(l2)  
+    item=seen_list_pred_true_words_index[matrixTxtIndex]
+    predlabel=clusterer.labels_[matrixTxtIndex]	
+    list_temp_eval.append([predlabel, item[1], item[2], item[3]]) 
+  
+  Evaluate(list_temp_eval)  
+  
+  #---------end temp hdbscan---------------
+  #####dic_bitri_keys_selectedClusters_seenBatch=clusterByHdbscan(dic_bitri_keys_selectedClusters_seenBatch, 10)'''
  
   new_not_clustered_inds_seen_batch=[]
   new_dic_bitri_keys_selectedClusters_seenBatch=dic_bitri_keys_selectedClusters_seenBatch

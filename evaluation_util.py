@@ -11,7 +11,7 @@ def evaluateByGram(dic_gramkeys_txtInds, seen_list_pred_true_words_index):
     texts_clustered_sum+=len(txtInds)
     unique_txtIds=unique_txtIds+txtInds	
     #if len(txtInds)>1: bigger_clusters_tri+=1  
-    print(mergedKey, txtInds)   
+    print("evaluateByGram",mergedKey, txtInds)   
     true_label_list=[]
     for txtInd in txtInds:
       true_label_list.append(seen_list_pred_true_words_index[txtInd][1])
