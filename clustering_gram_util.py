@@ -49,7 +49,8 @@ def mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, simThreshol
       if len(z)==len(set(txtIndsi)) or len(z)==len(set(txtIndsj)):
         dic_usedKey_to_maxSim[keys_list[i]]=max_sim
         dic_usedKey_to_maxSim[keys_list[j]]=max_sim
-        new_dic_bitri_keys_selectedClusters_seenBatch[keys_list[i]]=list(set(txtIndsi+txtIndsj))
+        target_key = keys_list[i] # if len(set(txtIndsi))>len(set(txtIndsj)) else keys_list[j]		
+        new_dic_bitri_keys_selectedClusters_seenBatch[target_key]=list(set(txtIndsi+txtIndsj))
         continue			  
       #--------end if txtIndsi is the subset of txtIndsj	  
 	  
@@ -65,8 +66,9 @@ def mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, simThreshol
       txtIndsi=	dic_bitri_keys_selectedClusters_seenBatch[keys_list[i]]
       txtIndsj=	dic_bitri_keys_selectedClusters_seenBatch[keys_list[max_j]]	  
       #select key (i,j) based on the size of (txtinds)
-      print("mergeByCommonTextInds", keys_list[i], ",", keys_list[max_j])	  
-      new_dic_bitri_keys_selectedClusters_seenBatch[keys_list[i]]=list(set(txtIndsi+txtIndsj))	  
+      print("mergeByCommonTextInds", keys_list[i], ",", keys_list[max_j])
+      target_key = keys_list[i] #if len(set(txtIndsi))>len(set(txtIndsj)) else keys_list[max_j]	  
+      new_dic_bitri_keys_selectedClusters_seenBatch[target_key]=list(set(txtIndsi+txtIndsj))	  
 		
       	  
   return new_dic_bitri_keys_selectedClusters_seenBatch
