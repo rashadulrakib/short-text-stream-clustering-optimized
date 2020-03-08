@@ -11,19 +11,31 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
   not_clustered_inds_seen_batch=[]
   #------sort dic_bitri_keys_selectedClusters_seenBatch by no of values in key.
   #------remove duplicate txtInd from large clusters
-  sortedKeys=sorted(dic_bitri_keys_selectedClusters_seenBatch, key = lambda key: len(dic_bitri_keys_selectedClusters_seenBatch[key]))
 
-  for key in sortedKeys:
-    #print("sorted", key, len(dic_bitri_keys_selectedClusters_seenBatch[key]), dic_bitri_keys_selectedClusters_seenBatch[key])
+  for key in dic_bitri_keys_selectedClusters_seenBatch.keys():
     txtInds= dic_bitri_keys_selectedClusters_seenBatch[key]
     for txtInd in txtInds:
       dic_txtId_to_grams.setdefault(txtInd, []).append(key)
+	  
+  sortedKey_TxtIndsByClsDistributions=sorted(dic_txtId_to_grams, key = lambda key: len(dic_txtId_to_grams[key]))
+  
+  prev_grams_key={}
+  for txtInd in sortedKey_TxtIndsByClsDistributions: 
+    clsDistributions=dic_txtId_to_grams[txtInd]
+    #if len(clsDistributions)==1:
+    #  prev_grams_key[clsDistributions[0]]=True	
+	
+    #clsDistributions=['brady peyton tom', 'bronco patriot rally'], 
+	#remove 'bronco patriot rally' from array if this appaer before. #not perfect yet 	
+    if (len(clsDistributions))>1:	  
+      continue
+    new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)	  
 
-  for txtInd, grams in dic_txtId_to_grams.items():
-    print("sorted", txtInd, grams)  
+    
+
        
     
-  return [dic_bitri_keys_selectedClusters_seenBatch, not_clustered_inds_seen_batch] #temporary	  
+  return [new_dic_bitri_keys_selectedClusters_seenBatch, not_clustered_inds_seen_batch] #temporary	  
 
 def mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, simThreshold=0.8):
   new_dic_bitri_keys_selectedClusters_seenBatch={}
