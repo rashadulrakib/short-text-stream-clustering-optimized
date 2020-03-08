@@ -17,20 +17,25 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
     for txtInd in txtInds:
       dic_txtId_to_grams.setdefault(txtInd, []).append(key)
 	  
-  sortedKey_TxtIndsByClsDistributions=sorted(dic_txtId_to_grams, key = lambda key: len(dic_txtId_to_grams[key]))
+  sortedTxtIndsByGrams=sorted(dic_txtId_to_grams, key = lambda key: len(dic_txtId_to_grams[key]))
   
   prev_grams_key={}
-  for txtInd in sortedKey_TxtIndsByClsDistributions: 
+  for txtInd in sortedTxtIndsByGrams: 
     clsDistributions=dic_txtId_to_grams[txtInd]
-    #if len(clsDistributions)==1:
-    #  prev_grams_key[clsDistributions[0]]=True	
-	
-    #clsDistributions=['brady peyton tom', 'bronco patriot rally'], 
-	#remove 'bronco patriot rally' from array if this appaer before. #not perfect yet 	
-    if (len(clsDistributions))>1:	  
-      continue
-    new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)	  
+    '''new_clsDistributions=[]
+    if len(clsDistributions)>1:
+      #clsDistributions=['brady peyton tom', 'bronco patriot rally'], 
+	  #remove 'bronco patriot rally' from array if this appaer before. #not perfect yet
+      
+      for gram in clsDistributions:
+        if gram not in prev_grams_key:
+          new_clsDistributions.append(gram)          		
 
+    if len(new_clsDistributions)==1:
+      clsDistributions=new_clsDistributions	  '''
+    if len(clsDistributions)==1:
+      prev_grams_key[clsDistributions[0]]=True
+      new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)
     
 
        
