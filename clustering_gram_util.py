@@ -22,7 +22,7 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
   prev_grams_key={}
   for txtInd in sortedTxtIndsByGrams: 
     clsDistributions=dic_txtId_to_grams[txtInd]
-    '''new_clsDistributions=[]
+    new_clsDistributions=[]
     if len(clsDistributions)>1:
       #clsDistributions=['brady peyton tom', 'bronco patriot rally'], 
 	  #remove 'bronco patriot rally' from array if this appaer before. #not perfect yet
@@ -31,15 +31,72 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
         if gram not in prev_grams_key:
           new_clsDistributions.append(gram)          		
 
-    if len(new_clsDistributions)==1:
-      clsDistributions=new_clsDistributions	  '''
-    if len(clsDistributions)==1:
+    if len(new_clsDistributions)>=1:
+      clsDistributions=new_clsDistributions
+	
+    if len(clsDistributions)==8:	  
+      prev_grams_key[clsDistributions[0]]=True
+      prev_grams_key[clsDistributions[1]]=True
+      prev_grams_key[clsDistributions[2]]=True	  
+      prev_grams_key[clsDistributions[3]]=True	  	  
+      prev_grams_key[clsDistributions[4]]=True	  	  	  
+      prev_grams_key[clsDistributions[5]]=True
+      prev_grams_key[clsDistributions[6]]=True 	  
+      prev_grams_key[clsDistributions[7]]=True 	  
+      new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)
+    elif len(clsDistributions)==7:	  
+      prev_grams_key[clsDistributions[0]]=True
+      prev_grams_key[clsDistributions[1]]=True
+      prev_grams_key[clsDistributions[2]]=True	  
+      prev_grams_key[clsDistributions[3]]=True	  	  
+      prev_grams_key[clsDistributions[4]]=True	  	  	  
+      prev_grams_key[clsDistributions[5]]=True	  	  	  	  
+      prev_grams_key[clsDistributions[6]]=True	  
+      new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)
+    if len(clsDistributions)==6:	  
+      prev_grams_key[clsDistributions[0]]=True
+      prev_grams_key[clsDistributions[1]]=True
+      prev_grams_key[clsDistributions[2]]=True	  
+      prev_grams_key[clsDistributions[3]]=True	  	  
+      prev_grams_key[clsDistributions[4]]=True	  	  	  
+      prev_grams_key[clsDistributions[5]]=True	  	  	  	  
+      new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)	
+    elif len(clsDistributions)==5:	  
+      prev_grams_key[clsDistributions[0]]=True
+      prev_grams_key[clsDistributions[1]]=True
+      prev_grams_key[clsDistributions[2]]=True	  
+      prev_grams_key[clsDistributions[3]]=True	  	  
+      prev_grams_key[clsDistributions[4]]=True	  	  	  
+      new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd) 	
+    elif len(clsDistributions)==4:	  
+      prev_grams_key[clsDistributions[0]]=True
+      prev_grams_key[clsDistributions[1]]=True
+      prev_grams_key[clsDistributions[2]]=True	  
+      prev_grams_key[clsDistributions[3]]=True	  	  
+      new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)	  	  
+    elif len(clsDistributions)==3:	  
+      prev_grams_key[clsDistributions[0]]=True
+      prev_grams_key[clsDistributions[1]]=True
+      prev_grams_key[clsDistributions[2]]=True	  
+      new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)  	  
+    elif len(clsDistributions)==2:	  
+      prev_grams_key[clsDistributions[0]]=True
+      prev_grams_key[clsDistributions[1]]=True	  
+      new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)	
+    elif len(clsDistributions)==1:
       prev_grams_key[clsDistributions[0]]=True
       new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)
     
 
-       
-    
+  temp_dic={} 
+  for key, items in new_dic_bitri_keys_selectedClusters_seenBatch.items():
+    if len(items)==1:
+      continue
+    temp_dic[key]=items
+  	
+  
+  new_dic_bitri_keys_selectedClusters_seenBatch=temp_dic  
+     
   return [new_dic_bitri_keys_selectedClusters_seenBatch, not_clustered_inds_seen_batch] #temporary	  
 
 def mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, simThreshold=0.8):
