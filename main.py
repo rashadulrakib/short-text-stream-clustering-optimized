@@ -12,11 +12,13 @@ import os
 from evaluation import Evaluate
 from read_pred_true_text import ReadPredTrueText
 
+from datetime import datetime
+
 gloveFile = "/home/owner/PhD/dr.norbert/dataset/shorttext/glove.42B.300d/glove.42B.300d.txt"
 wordVectorsDic={}
 #wordVectorsDic = extractAllWordVecs(gloveFile, 300)
 
-list_pred_true_words_index=readlistWholeJsonDataSet("News")
+list_pred_true_words_index=readlistWholeJsonDataSet("NTS-mstream")
 fileName="News_clusters"
 fileName_to_assigned="News_clusters_to-assign"
 
@@ -36,6 +38,8 @@ batchNo=0
 
 dic_bitri_keys_selectedClusters_seenBatch={}
 not_clustered_inds_seen_batch=[]
+
+now = datetime.now()
 
 for start in range(0,allTexts,batchSize): 
   batchNo+=1
@@ -69,4 +73,6 @@ for start in range(0,allTexts,batchSize):
 '''listtuple_pred_true_text=ReadPredTrueText(fileName)
 Evaluate(listtuple_pred_true_text)'''	
       
-  
+later = datetime.now()
+difference = (later - now).total_seconds()  
+print("time diff", difference)
