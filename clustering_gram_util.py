@@ -99,8 +99,8 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
       new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)	
     el'''
 
-    if len(clsDistributions)>=1 and len(clsDistributions)<=mean_distSize+2.5*std_distSize: #stable
-    #if len(clsDistributions)>=1:	
+    #if len(clsDistributions)>=1 and len(clsDistributions)<=mean_distSize+2.5*std_distSize: #stable
+    if len(clsDistributions)>=1:	
       for clsDistribution in clsDistributions:
         prev_grams_key[clsDistribution]=True
       new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)        		
@@ -111,9 +111,26 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
     #  new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)
     
 
+  std_size=0
+  min_size=0
+  list_sizes=[]
+  
+  for key, items in new_dic_bitri_keys_selectedClusters_seenBatch.items():
+    size=len(items)
+    list_sizes.append(size)
+	
+  min_size=statistics.mean(list_sizes)
+  std_size=statistics.stdev(list_sizes)	
+  
+  print("removeCommonTxtInds#####", min_size, std_size)
+
+  	
+    	
+   
+
   temp_dic={} 
   for key, items in new_dic_bitri_keys_selectedClusters_seenBatch.items():
-    if len(items)<=20: #stable
+    if len(items)<=int(abs(min_size-std_size)/1.2): #stable
       continue
     temp_dic[key]=items
   	

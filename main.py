@@ -18,7 +18,7 @@ gloveFile = "/home/owner/PhD/dr.norbert/dataset/shorttext/glove.42B.300d/glove.4
 wordVectorsDic={}
 #wordVectorsDic = extractAllWordVecs(gloveFile, 300)
 
-list_pred_true_words_index=readlistWholeJsonDataSet("News")
+list_pred_true_words_index=readlistWholeJsonDataSet("Tweets") #NTS-mstream
 fileName="News_clusters"
 fileName_to_assigned="News_clusters_to-assign"
 
