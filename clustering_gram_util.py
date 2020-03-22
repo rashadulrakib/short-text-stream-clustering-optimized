@@ -99,7 +99,8 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
       new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)	
     el'''
 
-    if len(clsDistributions)<=mean_distSize+0.5*std_distSize and len(clsDistributions)>=1:
+    if len(clsDistributions)>=1 and len(clsDistributions)<=mean_distSize+2.5*std_distSize: #stable
+    #if len(clsDistributions)>=1:	
       for clsDistribution in clsDistributions:
         prev_grams_key[clsDistribution]=True
       new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)        		
@@ -112,7 +113,7 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
 
   temp_dic={} 
   for key, items in new_dic_bitri_keys_selectedClusters_seenBatch.items():
-    if len(items)==1:
+    if len(items)<=20: #stable
       continue
     temp_dic[key]=items
   	

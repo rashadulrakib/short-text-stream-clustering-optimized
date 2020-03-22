@@ -18,7 +18,7 @@ gloveFile = "/home/owner/PhD/dr.norbert/dataset/shorttext/glove.42B.300d/glove.4
 wordVectorsDic={}
 #wordVectorsDic = extractAllWordVecs(gloveFile, 300)
 
-list_pred_true_words_index=readlistWholeJsonDataSet("NTS-mstream")
+list_pred_true_words_index=readlistWholeJsonDataSet("News")
 fileName="News_clusters"
 fileName_to_assigned="News_clusters_to-assign"
 
@@ -48,7 +48,9 @@ for start in range(0,allTexts,batchSize):
   sub_list_pred_true_words_index=list_pred_true_words_index[start:end]
   print(len(sub_list_pred_true_words_index))
   #cluster_sd(sub_list_pred_true_words_index)
+  
   not_clustered_inds_seen_batch, dic_bitri_keys_selectedClusters_seenBatch=cluster_gram_freq(sub_list_pred_true_words_index, batchNo, dic_bitri_keys_selectedClusters_seenBatch, not_clustered_inds_seen_batch, list_pred_true_words_index[0:end])
+  
   predsSeen_list_pred_true_words_index=evaluateByGram(dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end])
   Evaluate(predsSeen_list_pred_true_words_index) 
   
