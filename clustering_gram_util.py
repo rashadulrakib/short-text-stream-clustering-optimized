@@ -19,6 +19,20 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
 	  
   sortedTxtIndsByGrams=sorted(dic_txtId_to_grams, key = lambda key: len(dic_txtId_to_grams[key]))
   
+  list_distSize=[]  
+  for txtInd in sortedTxtIndsByGrams:
+    clsDistributions=dic_txtId_to_grams[txtInd]	
+    size=len(clsDistributions)
+    #if size==1:
+    #  continue	
+    list_distSize.append(size)
+
+  mean_distSize=statistics.mean(list_distSize)
+  std_distSize=statistics.stdev(list_distSize)
+
+  print("mean_distSize", mean_distSize, std_distSize)  
+	
+  
   prev_grams_key={}
   for txtInd in sortedTxtIndsByGrams: 
     clsDistributions=dic_txtId_to_grams[txtInd]
@@ -34,7 +48,7 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
     if len(new_clsDistributions)>=1:
       clsDistributions=new_clsDistributions
 	
-    if len(clsDistributions)==8:	  
+    '''if len(clsDistributions)==8:	  
       prev_grams_key[clsDistributions[0]]=True
       prev_grams_key[clsDistributions[1]]=True
       prev_grams_key[clsDistributions[2]]=True	  
@@ -83,9 +97,17 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
       prev_grams_key[clsDistributions[0]]=True
       prev_grams_key[clsDistributions[1]]=True	  
       new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)	
-    elif len(clsDistributions)==1:
-      prev_grams_key[clsDistributions[0]]=True
-      new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)
+    el'''
+
+    if len(clsDistributions)<=mean_distSize+0.5*std_distSize and len(clsDistributions)>=1:
+      for clsDistribution in clsDistributions:
+        prev_grams_key[clsDistribution]=True
+      new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)        		
+        	  
+	
+    #if len(clsDistributions)==1:
+    #  prev_grams_key[clsDistributions[0]]=True
+    #  new_dic_bitri_keys_selectedClusters_seenBatch.setdefault(clsDistributions[0], []).append(txtInd)
     
 
   temp_dic={} 
