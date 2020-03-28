@@ -8,14 +8,19 @@ from compute_util import computeSimBtnList
 def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
   dic_txtId_to_grams={}
   new_dic_bitri_keys_selectedClusters_seenBatch={}
-  not_clustered_inds_seen_batch=[]
+  #not_clustered_inds_seen_batch=[]
   #------sort dic_bitri_keys_selectedClusters_seenBatch by no of values in key.
   #------remove duplicate txtInd from large clusters
-
+  temp_totalTexts=[]
   for key in dic_bitri_keys_selectedClusters_seenBatch.keys():
     txtInds= dic_bitri_keys_selectedClusters_seenBatch[key]
+    txtInds=set(txtInds)	
+    temp_totalTexts	+=txtInds
     for txtInd in txtInds:
       dic_txtId_to_grams.setdefault(txtInd, []).append(key)
+
+  temp_totalTexts=list(set(temp_totalTexts))	  
+  print("temp_totalTexts=", len(temp_totalTexts))	  
 	  
   sortedTxtIndsByGrams=sorted(dic_txtId_to_grams, key = lambda key: len(dic_txtId_to_grams[key]))
   
@@ -137,7 +142,7 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
   
   new_dic_bitri_keys_selectedClusters_seenBatch=temp_dic  
      
-  return [new_dic_bitri_keys_selectedClusters_seenBatch, not_clustered_inds_seen_batch] #temporary	  
+  return new_dic_bitri_keys_selectedClusters_seenBatch#, not_clustered_inds_seen_batch] #temporary	  
 
 def mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, simThreshold=0.8):
   new_dic_bitri_keys_selectedClusters_seenBatch={}

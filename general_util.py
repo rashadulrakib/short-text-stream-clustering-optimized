@@ -1,5 +1,20 @@
 from groupTxt_ByClass import groupItemsBySingleKeyIndex
 
+def extractSeenNotClustered(predsSeen_list_pred_true_words_index, sub_list_pred_true_words_index):
+  not_clustered_inds_batch=[]
+  
+  predSeenIndex=[]
+  for item in predsSeen_list_pred_true_words_index:
+    predSeenIndex.append(item[3])
+
+  for item in sub_list_pred_true_words_index:
+    index = item[3]
+    if index in predSeenIndex:
+      continue
+    not_clustered_inds_batch.append([item[0], item[1], item[2], item[3]])	  
+  
+  return not_clustered_inds_batch
+
 def print_by_group(listtuple_pred_true_text, grIndex):
   dic_tupple_class=groupItemsBySingleKeyIndex(listtuple_pred_true_text, grIndex)
   for label, pred_true_txts in sorted(dic_tupple_class.items()):

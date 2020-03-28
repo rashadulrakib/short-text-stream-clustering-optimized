@@ -32,7 +32,7 @@ def transpose(l1, l2):
         l2.append(row) 
     return l2 
 
-def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_selectedClusters_seenBatch={}, not_clustered_inds_seen_batch=[], seen_list_pred_true_words_index=[]):
+def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_selectedClusters_seenBatch={}, seen_list_pred_true_words_index=[]):
   dic_uniGram_to_textInds={}
   dic_biGram_to_textInds={}
   dic_triGram_to_textInds={}
@@ -59,7 +59,7 @@ def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_select
   
   dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, 0.1)
   
-  dic_bitri_keys_selectedClusters_seenBatch, not_clustered_inds_seen_batch=removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch)
+  dic_bitri_keys_selectedClusters_seenBatch=removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch)
   
   
   
@@ -99,11 +99,11 @@ def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_select
   #---------end temp hdbscan---------------'''
   #####dic_bitri_keys_selectedClusters_seenBatch=clusterByHdbscan(dic_bitri_keys_selectedClusters_seenBatch, 10)
  
-  new_not_clustered_inds_seen_batch=not_clustered_inds_seen_batch
+  #new_not_clustered_inds_seen_batch=not_clustered_inds_seen_batch
   new_dic_bitri_keys_selectedClusters_seenBatch=dic_bitri_keys_selectedClusters_seenBatch
   
   
-  return [new_not_clustered_inds_seen_batch, new_dic_bitri_keys_selectedClusters_seenBatch]
+  return new_dic_bitri_keys_selectedClusters_seenBatch
   '''dic_used_textIds={}
   dic_used_textIds, max_group_sum_tri, texts_clustered_by_tri, dictri_keys_selectedClusters=clusterByNgram(dic_triGram_to_textInds,tri_mean, tri_mean+tri_std+tri_std_csize_offset, dic_used_textIds, list_pred_true_words_index, seen_list_pred_true_words_index)
   
