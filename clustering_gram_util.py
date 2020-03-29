@@ -4,6 +4,7 @@ import numpy as np
 from compute_util import findCloseCluster_GramKey_lexical
 from compute_util import findCloseCluster_GramKey_Semantic
 from compute_util import computeSimBtnList
+from sent_vecgenerator import generate_sent_vecs_toktextdata
 
 def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
   dic_txtId_to_grams={}
@@ -135,7 +136,7 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
 
   temp_dic={} 
   for key, items in new_dic_bitri_keys_selectedClusters_seenBatch.items():
-    if len(items)<=int(abs(min_size-std_size)/1.2): #stable
+    if len(items)<=int(abs(min_size-std_size)/2): #stable
       continue
     temp_dic[key]=items
   	
@@ -247,6 +248,71 @@ def mergeByCommonWords(dic_biGram_to_textInds, dic_triGram_to_textInds, dic_bitr
   new_dic_bitri_keys_selectedClusters_seenBatch=dic_bitri_keys_selectedClusters_seenBatch	  
   
   return new_dic_bitri_keys_selectedClusters_seenBatch
+
+def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_selectedClusters_seenBatch, seen_list_pred_true_words_index, wordVectorsDic):
+  
+  new_not_clustered_inds_batch=[]
+  
+  ##follow Mstream
+  dic_ClusterGroupsDetail={}  
+  dic_ClusterWords={}
+  dic_ClusterTextWords={}
+  dic_ClusterVecs={}
+  
+  for key, txtInds in dic_bitri_keys_selectedClusters_seenBatch.items():
+    list_pred_true_words_index=[]
+    cluster_words=[]
+    txtWords=[]
+    vec=np.zeros(shape=[300])
+    for txtInd in txtInds:
+      pred= seen_list_pred_true_words_index[txtInd][0]
+      true= seen_list_pred_true_words_index[txtInd][1]
+      words= seen_list_pred_true_words_index[txtInd][2]
+      index= seen_list_pred_true_words_index[txtInd][3]	
+      list_pred_true_words_index.append([pred, true, words, index])
+      cluster_words.extend(words)
+      txtWords.append(words)
+      sent_vec=generate_sent_vecs_toktextdata([words], wordVectorsDic, 300)[0]
+      sent_vec=np.asarray(sent_vec)
+      vec=np.add(vec, sent_vec)	  
+	  
+    dic_ClusterGroupsDetail[key]=list_pred_true_words_index
+    dic_ClusterWords[key]=cluster_words	
+    dic_ClusterTextWords[key]=txtWords	
+    dic_ClusterVecs[key]=np.true_divide(vec, len(txtInds)+1)
+    #print("dic_ClusterVecs[key]", dic_ClusterVecs[key])	
+  
+  
+  ##end follow Mstream
+    
+  
+  keys_list=list(dic_bitri_keys_selectedClusters_seenBatch.keys())
+
+  for item in not_clustered_inds_batch:
+    word_arr=item[2]
+    global_index=item[3]
+    true=item[1]   	
+    closeKey_Lexical=findCloseCluster_GramKey_lexical(keys_list,word_arr,1)
+    closeKey_Semantic=findCloseCluster_GramKey_Semantic(keys_list,word_arr,0, wordVectorsDic, False)
+    if closeKey_Lexical==closeKey_Semantic:
+      new_pred=str(closeKey_Lexical)
+      new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
+    else:
+      closeKey_Lexical=findCloseCluster_GramKey_lexical(keys_list,word_arr,2)
+      if closeKey_Lexical != None:
+        new_pred=str(closeKey_Lexical)
+        new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])	  
+    #elif closeKey_Lexical != None:
+    #  new_pred=str(closeKey_Lexical)
+    #  new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
+    '''else:
+      if closeKey_Semantic !=None:
+        new_pred=str(closeKey_Semantic)
+        new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])'''  	
+	
+	
+
+  return new_not_clustered_inds_batch
 
 def assignToClusterBySimilarity(not_clustered_inds_seen_batch, seen_list_pred_true_words_index, dic_combined_keys_selectedClusters, wordVectorsDic):
   new_not_clustered_inds_seen_batch=[]

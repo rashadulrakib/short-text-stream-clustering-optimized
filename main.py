@@ -5,6 +5,7 @@ from clustering_gram import cluster_gram_freq
 from collections import Counter
 from clustering_gram_util import filterClusters
 from clustering_gram_util import assignToClusterBySimilarity
+from clustering_gram_util import assignToClusterSimDistribution
 from evaluation_util import evaluateByGram
 from dictionary_util import combineTwoDictionary
 from word_vec_extractor import extractAllWordVecs
@@ -16,8 +17,8 @@ from read_pred_true_text import ReadPredTrueText
 from datetime import datetime
 
 gloveFile = "/home/owner/PhD/dr.norbert/dataset/shorttext/glove.42B.300d/glove.42B.300d.txt"
-wordVectorsDic={}
-#wordVectorsDic = extractAllWordVecs(gloveFile, 300)
+#wordVectorsDic={}
+wordVectorsDic = extractAllWordVecs(gloveFile, 300)
 
 list_pred_true_words_index=readlistWholeJsonDataSet("News") #NTS-mstream
 fileName="News_clusters"
@@ -38,7 +39,7 @@ batchSize=allTexts
 batchNo=0
 
 dic_bitri_keys_selectedClusters_seenBatch={}
-not_clustered_inds_seen_batch=[]
+#not_clustered_inds_seen_batch=[]
 
 now = datetime.now()
 
@@ -54,10 +55,14 @@ for start in range(0,allTexts,batchSize):
   
   predsSeen_list_pred_true_words_index=evaluateByGram(dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end])
   not_clustered_inds_batch=extractSeenNotClustered(predsSeen_list_pred_true_words_index, sub_list_pred_true_words_index)
-  not_clustered_inds_seen_batch.extend(not_clustered_inds_batch)
+  #not_clustered_inds_seen_batch.extend(not_clustered_inds_batch)
   
-  Evaluate(predsSeen_list_pred_true_words_index) 
-  print("total texts=", len(predsSeen_list_pred_true_words_index)+len(not_clustered_inds_seen_batch))
+  not_clustered_inds_batch=assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end], wordVectorsDic)
+  
+  Evaluate(predsSeen_list_pred_true_words_index+not_clustered_inds_batch) 
+  print("total texts=", len(predsSeen_list_pred_true_words_index)+len(not_clustered_inds_batch))
+  
+  
   
   #texts in cluster + texts not in cluster should be =2000
   '''dictri_keys_selectedClusters_currentBatch, dicbi_keys_selectedClusters_currentBatch, not_clustered_inds_currentBatch, dic_combined_keys_selectedClusters, new_sub_list_pred_true_words_index=filterClusters(dictri_keys_selectedClusters_currentBatch, dicbi_keys_selectedClusters_currentBatch, sub_list_pred_true_words_index, list_pred_true_words_index[0:end])
