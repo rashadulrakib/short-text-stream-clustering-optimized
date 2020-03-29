@@ -3,6 +3,28 @@ from scipy.spatial import distance
 from scipy.spatial.distance import cosine
 import sys
 
+
+def computeTextSimCommonWord_WordDic(words_i, words_j, txt_i_len, txt_j_len):  
+  text_sim=0
+  commonCount=0
+  
+  len_i=len(words_i)
+  len_j=len(words_j)
+
+  if len_i>len_j:
+    temp=words_i
+    words_i=words_j
+    words_j=temp    
+ 
+  for word_i, i_count in words_i.items():
+    if word_i in words_j.keys():
+      commonCount=commonCount+i_count+words_j[word_i]
+  
+  if txt_i_len>0 and txt_j_len>0:
+    text_sim=commonCount/(txt_i_len+txt_j_len)
+    
+  return [text_sim, commonCount]
+
 def computeSimBtnList(txtIndsi, txtIndsj):
   if len(txtIndsj)<len(txtIndsi):
     temp=txtIndsj
@@ -61,5 +83,5 @@ def findCloseCluster_GramKey_Semantic(keys_list, word_arr, minMatch, wordVectors
     	
 
   
-  return closeKey_Semantic  
+  return [closeKey_Semantic, max_sim]  
   

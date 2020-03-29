@@ -4,6 +4,8 @@ import numpy as np
 from compute_util import findCloseCluster_GramKey_lexical
 from compute_util import findCloseCluster_GramKey_Semantic
 from compute_util import computeSimBtnList
+from txt_process_util import commonWordSims_clusterGroup
+from txt_process_util import semanticSims
 from sent_vecgenerator import generate_sent_vecs_toktextdata
 
 def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
@@ -135,8 +137,13 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
    
 
   temp_dic={} 
+  items_threshold= int(abs(min_size-std_size)/2)
+  if items_threshold<2:
+    items_threshold=2
+  print("items_threshold=", items_threshold)     
   for key, items in new_dic_bitri_keys_selectedClusters_seenBatch.items():
-    if len(items)<=int(abs(min_size-std_size)/2): #stable
+    #if len(items)<=int(abs(min_size-std_size)/2): #stable
+    if len(items)<=items_threshold:	
       continue
     temp_dic[key]=items
   	
@@ -277,7 +284,7 @@ def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_sele
       vec=np.add(vec, sent_vec)	  
 	  
     dic_ClusterGroupsDetail[key]=list_pred_true_words_index
-    dic_ClusterWords[key]=cluster_words	
+    dic_ClusterWords[key]=[Counter(cluster_words), len(cluster_words)]	
     dic_ClusterTextWords[key]=txtWords	
     dic_ClusterVecs[key]=np.true_divide(vec, len(txtInds)+1)
     #print("dic_ClusterVecs[key]", dic_ClusterVecs[key])	
@@ -286,6 +293,7 @@ def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_sele
   ##end follow Mstream
     
   
+  ####our logic starts
   keys_list=list(dic_bitri_keys_selectedClusters_seenBatch.keys())
 
   for item in not_clustered_inds_batch:
@@ -293,7 +301,7 @@ def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_sele
     global_index=item[3]
     true=item[1]   	
     closeKey_Lexical=findCloseCluster_GramKey_lexical(keys_list,word_arr,1)
-    closeKey_Semantic=findCloseCluster_GramKey_Semantic(keys_list,word_arr,0, wordVectorsDic, False)
+    closeKey_Semantic, max_Semantic_sim_gram=findCloseCluster_GramKey_Semantic(keys_list,word_arr,0, wordVectorsDic, False)
     if closeKey_Lexical==closeKey_Semantic:
       new_pred=str(closeKey_Lexical)
       new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
@@ -301,7 +309,28 @@ def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_sele
       closeKey_Lexical=findCloseCluster_GramKey_lexical(keys_list,word_arr,2)
       if closeKey_Lexical != None:
         new_pred=str(closeKey_Lexical)
-        new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])	  
+        new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
+      #elif max_Semantic_sim_gram>=0.8:
+      #  new_pred=str(closeKey_Lexical)
+      #  new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])	  
+      else:
+        dic_lex_Sim_CommonWords, maxPredLabel_lex, maxSim_lex, maxCommon_lex, minSim_lex=commonWordSims_clusterGroup(word_arr, dic_ClusterWords)
+		
+        text_Vec=generate_sent_vecs_toktextdata([word_arr], wordVectorsDic, 300)[0]		
+        dic_semanticSims, maxPredLabel_Semantic, maxSim_Semantic, minSim_semantic=semanticSims(text_Vec, dic_ClusterVecs)		
+        
+        if maxCommon_lex>0 and str(maxPredLabel_lex)==str(maxPredLabel_Semantic):
+          new_pred=str(maxPredLabel_lex)
+          new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
+        #elif maxCommon_lex>=6:
+        #  new_pred=str(maxPredLabel_lex)
+        #  new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
+        #elif maxSim_Semantic>=0.5:
+        #  new_pred=str(maxPredLabel_Semantic)
+        #  new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])		  
+        #  maxPredLabel=int(str(maxPredLabel))+1	
+        #  pred_true_text_ind_prevPred[0]=str(maxPredLabel)		  
+        #  new_outs.append(pred_true_text_ind_prevPred)	
     #elif closeKey_Lexical != None:
     #  new_pred=str(closeKey_Lexical)
     #  new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
