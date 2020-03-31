@@ -17,10 +17,10 @@ from read_pred_true_text import ReadPredTrueText
 from datetime import datetime
 
 gloveFile = "/home/owner/PhD/dr.norbert/dataset/shorttext/glove.42B.300d/glove.42B.300d.txt"
-#wordVectorsDic={}
-wordVectorsDic = extractAllWordVecs(gloveFile, 300)
+wordVectorsDic={}
+#wordVectorsDic = extractAllWordVecs(gloveFile, 300)
 
-list_pred_true_words_index=readlistWholeJsonDataSet("News") #NTS-mstream
+list_pred_true_words_index=readlistWholeJsonDataSet("News") #NTS-mstream, #Tweets, #News
 fileName="News_clusters"
 fileName_to_assigned="News_clusters_to-assign"
 
@@ -57,9 +57,9 @@ for start in range(0,allTexts,batchSize):
   not_clustered_inds_batch=extractSeenNotClustered(predsSeen_list_pred_true_words_index, sub_list_pred_true_words_index)
   #not_clustered_inds_seen_batch.extend(not_clustered_inds_batch)
   
-  not_clustered_inds_batch=assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end], wordVectorsDic)
+  #not_clustered_inds_batch=assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end], wordVectorsDic)
   
-  Evaluate(predsSeen_list_pred_true_words_index+not_clustered_inds_batch) 
+  Evaluate(predsSeen_list_pred_true_words_index) #+not_clustered_inds_batch) 
   print("total texts=", len(predsSeen_list_pred_true_words_index)+len(not_clustered_inds_batch))
   
   

@@ -137,9 +137,9 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
    
 
   temp_dic={} 
-  items_threshold= int(abs(min_size-std_size)/2)
-  if items_threshold<2:
-    items_threshold=2
+  items_threshold= int(abs(min_size-std_size)/3)
+  if items_threshold<3:
+    items_threshold=3
   print("items_threshold=", items_threshold)     
   for key, items in new_dic_bitri_keys_selectedClusters_seenBatch.items():
     #if len(items)<=int(abs(min_size-std_size)/2): #stable
@@ -286,7 +286,7 @@ def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_sele
     dic_ClusterGroupsDetail[key]=list_pred_true_words_index
     dic_ClusterWords[key]=[Counter(cluster_words), len(cluster_words)]	
     dic_ClusterTextWords[key]=txtWords	
-    dic_ClusterVecs[key]=np.true_divide(vec, len(txtInds)+1)
+    dic_ClusterVecs[key]=vec # np.true_divide(vec, len(txtInds)+1)
     #print("dic_ClusterVecs[key]", dic_ClusterVecs[key])	
   
   
@@ -295,12 +295,38 @@ def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_sele
   
   ####our logic starts
   keys_list=list(dic_bitri_keys_selectedClusters_seenBatch.keys())
+  
+  #new_clusters={}
 
   for item in not_clustered_inds_batch:
     word_arr=item[2]
     global_index=item[3]
-    true=item[1]   	
-    closeKey_Lexical=findCloseCluster_GramKey_lexical(keys_list,word_arr,1)
+    true=item[1]  
+
+    dic_lex_Sim_CommonWords, maxPredLabel_lex, maxSim_lex, maxCommon_lex, minSim_lex=commonWordSims_clusterGroup(word_arr, dic_ClusterWords)
+		
+    text_Vec=generate_sent_vecs_toktextdata([word_arr], wordVectorsDic, 300)[0]		
+    dic_semanticSims, maxPredLabel_Semantic, maxSim_Semantic, minSim_semantic=semanticSims(text_Vec, dic_ClusterVecs)		
+        
+    if maxCommon_lex>0 and str(maxPredLabel_lex)==str(maxPredLabel_Semantic):
+      new_pred=str(maxPredLabel_lex)
+      new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
+      '''if len(new_pred.split(' '))==1 and new_pred.isnumeric()==True:
+        #print("new_pred.isnumeric=", new_pred)
+        dic_ClusterVecs[new_pred]= np.add(dic_ClusterVecs[new_pred], np.asarray(text_Vec))
+        count_dic=dic_ClusterWords[new_pred][0]
+        totalwords_dic=dic_ClusterWords[new_pred][1] 
+        dic_ClusterWords[new_pred]=[count_dic+Counter(word_arr), totalwords_dic+len(word_arr)]'''	  
+    '''else:
+      new_key=str(len(dic_ClusterVecs)+10)
+      new_pred=new_key
+      new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
+      dic_ClusterVecs[new_pred]=np.asarray(text_Vec)
+      dic_ClusterWords[new_pred]=[Counter(word_arr), len(word_arr)]	  
+      #print("new_pred=", new_pred)'''	  
+	  
+ 	
+    '''closeKey_Lexical=findCloseCluster_GramKey_lexical(keys_list,word_arr,1)
     closeKey_Semantic, max_Semantic_sim_gram=findCloseCluster_GramKey_Semantic(keys_list,word_arr,0, wordVectorsDic, False)
     if closeKey_Lexical==closeKey_Semantic:
       new_pred=str(closeKey_Lexical)
@@ -322,6 +348,13 @@ def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_sele
         if maxCommon_lex>0 and str(maxPredLabel_lex)==str(maxPredLabel_Semantic):
           new_pred=str(maxPredLabel_lex)
           new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
+        #else: #assign to a new cluster
+        #  new_key=str(len(new_clusters)	+ len(keys_list)+10)
+        #  new_pred=new_key
+        #  new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])		  
+        #  new_clusters.setdefault(new_key,[]).append([new_pred, true, word_arr, global_index])		
+          		
+          		
         #elif maxCommon_lex>=6:
         #  new_pred=str(maxPredLabel_lex)
         #  new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
@@ -333,7 +366,7 @@ def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_sele
         #  new_outs.append(pred_true_text_ind_prevPred)	
     #elif closeKey_Lexical != None:
     #  new_pred=str(closeKey_Lexical)
-    #  new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
+    #  new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])'''
     '''else:
       if closeKey_Semantic !=None:
         new_pred=str(closeKey_Semantic)
