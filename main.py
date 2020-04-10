@@ -20,7 +20,7 @@ gloveFile = "/home/owner/PhD/dr.norbert/dataset/shorttext/glove.42B.300d/glove.4
 wordVectorsDic={}
 #wordVectorsDic = extractAllWordVecs(gloveFile, 300)
 
-list_pred_true_words_index=readlistWholeJsonDataSet("News") #NTS-mstream, #Tweets, #News
+list_pred_true_words_index=readlistWholeJsonDataSet("Tweets") #NTS-mstream, #Tweets, #News
 fileName="News_clusters"
 fileName_to_assigned="News_clusters_to-assign"
 
@@ -34,7 +34,7 @@ if os.path.exists(fileName_to_assigned):
 
 
 allTexts=len(list_pred_true_words_index)
-batchSize=allTexts
+batchSize=1000
 
 batchNo=0
 
@@ -42,6 +42,9 @@ dic_bitri_keys_selectedClusters_seenBatch={}
 #not_clustered_inds_seen_batch=[]
 
 now = datetime.now()
+
+globalList_clustered=[]
+globalList_not_clustered=[]
 
 for start in range(0,allTexts,batchSize): 
   batchNo+=1
@@ -55,9 +58,13 @@ for start in range(0,allTexts,batchSize):
   
   predsSeen_list_pred_true_words_index=evaluateByGram(dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end])
   not_clustered_inds_batch=extractSeenNotClustered(predsSeen_list_pred_true_words_index, sub_list_pred_true_words_index)
+  
   #not_clustered_inds_seen_batch.extend(not_clustered_inds_batch)
   
   #not_clustered_inds_batch=assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end], wordVectorsDic)
+  globalList_clustered.extend(predsSeen_list_pred_true_words_index)
+  globalList_not_clustered.extend(not_clustered_inds_batch)
+  
   
   Evaluate(predsSeen_list_pred_true_words_index) #+not_clustered_inds_batch) 
   print("total texts=", len(predsSeen_list_pred_true_words_index)+len(not_clustered_inds_batch))
@@ -84,7 +91,10 @@ for start in range(0,allTexts,batchSize):
 
 '''listtuple_pred_true_text=ReadPredTrueText(fileName)
 Evaluate(listtuple_pred_true_text)'''	
-      
+
+print('----------global list-----------')
+Evaluate(globalList_clustered)      
+	  
 later = datetime.now()
 difference = (later - now).total_seconds()  
 print("time diff", difference)
