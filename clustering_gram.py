@@ -57,6 +57,7 @@ def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_select
   
   dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonWords(dic_biGram_to_textInds, dic_triGram_to_textInds, dic_bitri_keys_selectedClusters_seenBatch, 2, tri_mean+tri_std, tri_mean+tri_std+tri_std_csize_offset, bi_mean+bi_std, bi_mean+bi_std+bi_std_csize_offset)
   
+  
   dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, 0.1)
   
   dic_bitri_keys_selectedClusters_seenBatch=removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch)

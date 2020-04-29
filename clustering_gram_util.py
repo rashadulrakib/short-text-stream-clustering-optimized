@@ -140,6 +140,7 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
   items_threshold= int(abs(min_size-std_size)/3)
   if items_threshold<3:
     items_threshold=3
+  #items_threshold=2
   print("items_threshold=", items_threshold)     
   for key, items in new_dic_bitri_keys_selectedClusters_seenBatch.items():
     #if len(items)<=int(abs(min_size-std_size)/2): #stable

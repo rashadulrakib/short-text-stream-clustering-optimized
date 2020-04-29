@@ -1,5 +1,6 @@
 from general_util import readlistWholeJsonDataSet
 from general_util import extractSeenNotClustered
+from general_util import print_by_group
 from clustering_sd import cluster_sd
 from clustering_gram import cluster_gram_freq
 from collections import Counter
@@ -34,7 +35,7 @@ if os.path.exists(fileName_to_assigned):
 
 
 allTexts=len(list_pred_true_words_index)
-batchSize=1000
+batchSize=4000
 
 batchNo=0
 
@@ -98,3 +99,22 @@ Evaluate(globalList_clustered)
 later = datetime.now()
 difference = (later - now).total_seconds()  
 print("time diff", difference)
+
+
+print("--------evaluate global gram clustering-------")		
+temp_list=[]
+temp_dic_txtInd={}
+for item in globalList_clustered:
+  ind=item[3]
+  if ind in temp_dic_txtInd:
+    continue
+  temp_list.append([item[0], item[1], item[2], item[3]])	
+  temp_dic_txtInd[ind]=item		
+        
+globalList_clustered=temp_list		
+Evaluate(globalList_clustered)
+print('------print_by_group(globalList_clustered, 0)----')
+print_by_group(globalList_clustered, 0)
+print('------print_by_group(globalList_not_clustered, 0)----')
+print_by_group(globalList_not_clustered, 1)
+print("final==", len(globalList_clustered)+len(globalList_not_clustered))
