@@ -140,7 +140,7 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
   items_threshold= int(abs(min_size-std_size)/3)
   if items_threshold<3:
     items_threshold=3
-  #items_threshold=2
+  #items_threshold=4
   print("items_threshold=", items_threshold)     
   for key, items in new_dic_bitri_keys_selectedClusters_seenBatch.items():
     #if len(items)<=int(abs(min_size-std_size)/2): #stable
@@ -215,7 +215,7 @@ def mergeByCommonWords(dic_biGram_to_textInds, dic_triGram_to_textInds, dic_bitr
       continue	
     #keys_list=dic_bitri_keys_selectedClusters_seenBatch.keys()
     word_arr=key.split(' ')	
-    closeKey_Lexical=findCloseCluster_GramKey_lexical(keys_list,word_arr,2)
+    closeKey_Lexical=findCloseCluster_GramKey_lexical(keys_list,word_arr,minCommomGram)
     if closeKey_Lexical==None:
       closeKey_Lexical=key	
       dic_bitri_keys_selectedClusters_seenBatch[key]=list(set(txtInds))

@@ -29,92 +29,93 @@ if os.path.exists(fileName):
   os.remove(fileName)
 if os.path.exists(fileName_to_assigned):
   os.remove(fileName_to_assigned)  
+  
+  
+def populateNewList(globalList_not_clustered):
+  list_pred_true_words_index=[]
+  for i in range(len(globalList_not_clustered)):
+    item=globalList_not_clustered[i]
+    list_pred_true_words_index.append([item[0], item[1], item[2], i])
+
+  return list_pred_true_words_index	
+  
+
+def clusterByBatch(batchSize, list_pred_true_words_index, simThreshold=0.1, minCommomGram=2):
+  allTexts=len(list_pred_true_words_index)
+  batchNo=0
+  dic_bitri_keys_selectedClusters_seenBatch={}
+  
+  globalList_clustered=[]
+  globalList_not_clustered=[]
+
+  for start in range(0,allTexts,batchSize): 
+    batchNo+=1
+    end= start+batchSize if start+batchSize<allTexts else allTexts  
+    print(start, end)
+    sub_list_pred_true_words_index=list_pred_true_words_index[start:end]
+    print(len(sub_list_pred_true_words_index))
+    #cluster_sd(sub_list_pred_true_words_index)
+  
+    dic_bitri_keys_selectedClusters_seenBatch=cluster_gram_freq(simThreshold, minCommomGram, sub_list_pred_true_words_index, batchNo, dic_bitri_keys_selectedClusters_seenBatch,  list_pred_true_words_index[0:end])
+  
+    predsSeen_list_pred_true_words_index=evaluateByGram(dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end])
+    not_clustered_inds_batch=extractSeenNotClustered(predsSeen_list_pred_true_words_index, sub_list_pred_true_words_index)
+  
+    #not_clustered_inds_seen_batch.extend(not_clustered_inds_batch)
+  
+    #not_clustered_inds_batch=assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end], wordVectorsDic)
+    globalList_clustered.extend(predsSeen_list_pred_true_words_index)
+    globalList_not_clustered.extend(not_clustered_inds_batch)
+  
+  
+    #Evaluate(predsSeen_list_pred_true_words_index) #+not_clustered_inds_batch) 
+    print("total texts=", len(predsSeen_list_pred_true_words_index))
+	
+
+  print("--------evaluate global gram clustering-------")		
+  temp_list=[]
+  temp_dic_txtInd={}
+  for item in globalList_clustered:
+    ind=item[3]
+    if ind in temp_dic_txtInd:
+      continue
+    temp_list.append([item[0], item[1], item[2], item[3]])	
+    temp_dic_txtInd[ind]=item		
+        
+  globalList_clustered=temp_list		
+  Evaluate(globalList_clustered)
+	
+  #update list_pred_true_words_index
+  #update batchSize each time we call clusterByBatch  
+  print("total texts=", len(globalList_clustered+globalList_not_clustered))
+  return [globalList_clustered, globalList_not_clustered]
 
 
-
-
-
-allTexts=len(list_pred_true_words_index)
-batchSize=4000
-
-batchNo=0
-
-dic_bitri_keys_selectedClusters_seenBatch={}
-#not_clustered_inds_seen_batch=[]
+all_global=[]
 
 now = datetime.now()
 
-globalList_clustered=[]
-globalList_not_clustered=[]
+globalList_clustered, globalList_not_clustered=clusterByBatch(4000, list_pred_true_words_index,0.08, 2)
+all_global.extend(globalList_clustered)
 
-for start in range(0,allTexts,batchSize): 
-  batchNo+=1
-  end= start+batchSize if start+batchSize<allTexts else allTexts  
-  print(start, end)
-  sub_list_pred_true_words_index=list_pred_true_words_index[start:end]
-  print(len(sub_list_pred_true_words_index))
-  #cluster_sd(sub_list_pred_true_words_index)
-  
-  dic_bitri_keys_selectedClusters_seenBatch=cluster_gram_freq(sub_list_pred_true_words_index, batchNo, dic_bitri_keys_selectedClusters_seenBatch,  list_pred_true_words_index[0:end])
-  
-  predsSeen_list_pred_true_words_index=evaluateByGram(dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end])
-  not_clustered_inds_batch=extractSeenNotClustered(predsSeen_list_pred_true_words_index, sub_list_pred_true_words_index)
-  
-  #not_clustered_inds_seen_batch.extend(not_clustered_inds_batch)
-  
-  #not_clustered_inds_batch=assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_selectedClusters_seenBatch, list_pred_true_words_index[0:end], wordVectorsDic)
-  globalList_clustered.extend(predsSeen_list_pred_true_words_index)
-  globalList_not_clustered.extend(not_clustered_inds_batch)
-  
-  
-  Evaluate(predsSeen_list_pred_true_words_index) #+not_clustered_inds_batch) 
-  print("total texts=", len(predsSeen_list_pred_true_words_index)+len(not_clustered_inds_batch))
-  
-  
-  
-  #texts in cluster + texts not in cluster should be =2000
-  '''dictri_keys_selectedClusters_currentBatch, dicbi_keys_selectedClusters_currentBatch, not_clustered_inds_currentBatch, dic_combined_keys_selectedClusters, new_sub_list_pred_true_words_index=filterClusters(dictri_keys_selectedClusters_currentBatch, dicbi_keys_selectedClusters_currentBatch, sub_list_pred_true_words_index, list_pred_true_words_index[0:end])
-  
-  not_clustered_inds_seen_batch.extend(not_clustered_inds_currentBatch)
-  
-  appendResultFile(new_sub_list_pred_true_words_index, fileName)
-  
-  if batchNo>=1: # and batchNo%2==0:
-    dic_preds, new_not_clustered_inds_seen_batch=assignToClusterBySimilarity(not_clustered_inds_seen_batch, list_pred_true_words_index[0:end], dic_combined_keys_selectedClusters, wordVectorsDic)
-	
-    #appendResultFile(new_not_clustered_inds_seen_batch, fileName)
-    appendResultFile(new_not_clustered_inds_seen_batch, fileName_to_assigned)	
-    	
-	
-    #new_comb=combineTwoDictionary(dic_preds,dic_combined_keys_selectedClusters, False)	
-    #evaluateByGram(new_comb, list_pred_true_words_index[0:end])	
-    not_clustered_inds_seen_batch=[]'''
+list_pred_true_words_index=populateNewList(globalList_not_clustered)
+globalList_clustered, globalList_not_clustered=clusterByBatch(4000, list_pred_true_words_index, 0.05, 2)
+all_global.extend(globalList_clustered)
 
-'''listtuple_pred_true_text=ReadPredTrueText(fileName)
-Evaluate(listtuple_pred_true_text)'''	
+list_pred_true_words_index=populateNewList(globalList_not_clustered)
+globalList_clustered, globalList_not_clustered=clusterByBatch(4000, list_pred_true_words_index, 0.02, 2)
+all_global.extend(globalList_clustered)
 
-print('----------global list-----------')
-Evaluate(globalList_clustered)      
-	  
+
+
+
+
+
+Evaluate(all_global)
+print("final total texts=", len(all_global+globalList_not_clustered))
+
 later = datetime.now()
 difference = (later - now).total_seconds()  
-print("time diff", difference)
+print("time diff", difference)	
 
 
-print("--------evaluate global gram clustering-------")		
-temp_list=[]
-temp_dic_txtInd={}
-for item in globalList_clustered:
-  ind=item[3]
-  if ind in temp_dic_txtInd:
-    continue
-  temp_list.append([item[0], item[1], item[2], item[3]])	
-  temp_dic_txtInd[ind]=item		
-        
-globalList_clustered=temp_list		
-Evaluate(globalList_clustered)
-print('------print_by_group(globalList_clustered, 0)----')
-print_by_group(globalList_clustered, 0)
-print('------print_by_group(globalList_not_clustered, 0)----')
-print_by_group(globalList_not_clustered, 1)
-print("final==", len(globalList_clustered)+len(globalList_not_clustered))

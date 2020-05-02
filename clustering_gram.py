@@ -32,7 +32,7 @@ def transpose(l1, l2):
         l2.append(row) 
     return l2 
 
-def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_selectedClusters_seenBatch={}, seen_list_pred_true_words_index=[]):
+def cluster_gram_freq(simThreshold, minCommomGram, list_pred_true_words_index, batchNo, dic_bitri_keys_selectedClusters_seenBatch={}, seen_list_pred_true_words_index=[]):
   dic_uniGram_to_textInds={}
   dic_biGram_to_textInds={}
   dic_triGram_to_textInds={}
@@ -55,10 +55,10 @@ def cluster_gram_freq(list_pred_true_words_index, batchNo, dic_bitri_keys_select
   bi_std,bi_mean,bi_max,bi_min=populateNgramStatistics(dic_biGram_to_textInds, 1)
   tri_std,tri_mean,tri_max,tri_min=populateNgramStatistics(dic_triGram_to_textInds, 1)
   
-  dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonWords(dic_biGram_to_textInds, dic_triGram_to_textInds, dic_bitri_keys_selectedClusters_seenBatch, 2, tri_mean+tri_std, tri_mean+tri_std+tri_std_csize_offset, bi_mean+bi_std, bi_mean+bi_std+bi_std_csize_offset)
+  dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonWords(dic_biGram_to_textInds, dic_triGram_to_textInds, dic_bitri_keys_selectedClusters_seenBatch, minCommomGram, tri_mean+tri_std, tri_mean+tri_std+tri_std_csize_offset, bi_mean+bi_std, bi_mean+bi_std+bi_std_csize_offset)
   
   
-  dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, 0.1)
+  dic_bitri_keys_selectedClusters_seenBatch=mergeByCommonTextInds(dic_bitri_keys_selectedClusters_seenBatch, simThreshold)
   
   dic_bitri_keys_selectedClusters_seenBatch=removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch)
   
