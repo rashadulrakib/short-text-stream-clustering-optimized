@@ -35,8 +35,12 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
     #  continue	
     list_distSize.append(size)
 
-  mean_distSize=statistics.mean(list_distSize)
-  std_distSize=statistics.stdev(list_distSize)
+  mean_distSize=0
+  if len(list_distSize)>=1:
+    mean_distSize=statistics.mean(list_distSize)
+  std_distSize=mean_distSize
+  if len(list_distSize)>=2:  
+    std_distSize=statistics.stdev(list_distSize)
 
   print("mean_distSize", mean_distSize, std_distSize)  
 	
@@ -127,8 +131,12 @@ def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
     size=len(items)
     list_sizes.append(size)
 	
-  min_size=statistics.mean(list_sizes)
-  std_size=statistics.stdev(list_sizes)	
+  min_size=0 
+  if len(list_sizes)>=1:	
+    min_size=statistics.mean(list_sizes)
+  std_size=min_size
+  if len(list_sizes)>=2:  
+    std_size=statistics.stdev(list_sizes)	
   
   print("removeCommonTxtInds#####", min_size, std_size)
 
@@ -276,8 +284,9 @@ def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_sele
       pred= seen_list_pred_true_words_index[txtInd][0]
       true= seen_list_pred_true_words_index[txtInd][1]
       words= seen_list_pred_true_words_index[txtInd][2]
-      index= seen_list_pred_true_words_index[txtInd][3]	
-      list_pred_true_words_index.append([pred, true, words, index])
+      index= seen_list_pred_true_words_index[txtInd][3]
+      lockindex= seen_list_pred_true_words_index[txtInd][4]	  
+      list_pred_true_words_index.append([pred, true, words, index, lockindex])
       cluster_words.extend(words)
       txtWords.append(words)
       sent_vec=generate_sent_vecs_toktextdata([words], wordVectorsDic, 300)[0]
@@ -311,7 +320,7 @@ def assignToClusterSimDistribution(not_clustered_inds_batch, dic_bitri_keys_sele
         
     if maxCommon_lex>0 and str(maxPredLabel_lex)==str(maxPredLabel_Semantic):
       new_pred=str(maxPredLabel_lex)
-      new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index])
+      new_not_clustered_inds_batch.append([new_pred, true, word_arr, global_index, item[4]])
       '''if len(new_pred.split(' '))==1 and new_pred.isnumeric()==True:
         #print("new_pred.isnumeric=", new_pred)
         dic_ClusterVecs[new_pred]= np.add(dic_ClusterVecs[new_pred], np.asarray(text_Vec))
@@ -392,13 +401,13 @@ def assignToClusterBySimilarity(not_clustered_inds_seen_batch, seen_list_pred_tr
       dic_preds.setdefault(closeKey_Lexical,[]).append(txtInd)
       count+=1	
 	  
-      new_not_clustered_inds_seen_batch.append([closeKey_Lexical ,seen_item[1], seen_item[2], seen_item[3]])  	  
+      new_not_clustered_inds_seen_batch.append([closeKey_Lexical ,seen_item[1], seen_item[2], seen_item[3], seen_item[4]])  	  
     else:
       if closeKey_Semantic !=None:
         dic_preds.setdefault(closeKey_Semantic,[]).append(txtInd)
         count+=1
 		
-        new_not_clustered_inds_seen_batch.append([closeKey_Semantic ,seen_item[1], seen_item[2], seen_item[3]])		
+        new_not_clustered_inds_seen_batch.append([closeKey_Semantic ,seen_item[1], seen_item[2], seen_item[3], seen_item[4]])		
         	  
 	
         	
@@ -448,7 +457,7 @@ def filterClusters(dictri_keys_selectedClusters_currentBatch, dicbi_keys_selecte
     if index in dic_txtIds:
       cluster_key=dic_txtIds[index]	
       seen_item=seen_list_pred_true_words_index[index]
-      new_sub_list_pred_true_words_index.append([cluster_key, seen_item[1], seen_item[2], seen_item[3]]) 
+      new_sub_list_pred_true_words_index.append([cluster_key, seen_item[1], seen_item[2], seen_item[3], seen_item[4]]) 
 	  
       continue 	
     new_not_clustered_inds_currentBatch.append(index)
@@ -725,9 +734,17 @@ def populateNgramStatistics(dic_gram_to_textInds, minTxtIndsForNgram=1):
   for key in ordered_keys_gram_to_textInds:
     #print(key, dic_gram_to_textInds[key])
     if len(dic_gram_to_textInds[key])>minTxtIndsForNgram: txtIndsSize.append(len(dic_gram_to_textInds[key]))
-  size_std=statistics.stdev(txtIndsSize)
-  size_mean=statistics.mean(txtIndsSize) 
-  size_max=max(txtIndsSize)  
-  size_min=min(txtIndsSize)
+  
+  
+  size_mean=0
+  size_max=0
+  size_min=0
+  if len(txtIndsSize)>=1:
+    size_mean=statistics.mean(txtIndsSize)
+    size_max=max(txtIndsSize)  
+    size_min=min(txtIndsSize)
+  size_std=size_mean  
+  if len(txtIndsSize)>=2:
+    size_std=statistics.stdev(txtIndsSize)
   
   return [size_std, size_mean, size_max, size_min]

@@ -11,7 +11,7 @@ def extractSeenNotClustered(predsSeen_list_pred_true_words_index, sub_list_pred_
     index = item[3]
     if index in predSeenIndex:
       continue
-    not_clustered_inds_batch.append([item[0], item[1], item[2], item[3]])	  
+    not_clustered_inds_batch.append([item[0], item[1], item[2], item[3], item[4]])	  
   
   return not_clustered_inds_batch
 
@@ -29,7 +29,7 @@ def readlistWholeJsonDataSet(datasetName):
   file1=open(datasetName,"r")
   lines = file1.readlines()
   file1.close()
-  list_pred_true_words_index=[]
+  list_pred_true_words_index_lockindex=[]
   i=-1  
   for line in lines:
     line=line.strip()  
@@ -40,8 +40,8 @@ def readlistWholeJsonDataSet(datasetName):
     if len(true)==0 or len(words)==0:
       continue
     i+=1 	  
-    list_pred_true_words_index.append([-1, true, words, i])
-  return list_pred_true_words_index
+    list_pred_true_words_index_lockindex.append([-1, true, words, i, i])
+  return list_pred_true_words_index_lockindex
   
 def readDicWholeJsonDataSet(datasetName):
   file1=open(datasetName,"r")
