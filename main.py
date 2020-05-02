@@ -35,7 +35,7 @@ def populateNewList(globalList_not_clustered):
   list_pred_true_words_index_lockindex=[]
   for i in range(len(globalList_not_clustered)):
     item=globalList_not_clustered[i]
-    list_pred_true_words_index_lockindex.append([item[0], item[1], item[2], i])
+    list_pred_true_words_index_lockindex.append([item[0], item[1], item[2], i, item[4]])
 
   return list_pred_true_words_index_lockindex	
   
