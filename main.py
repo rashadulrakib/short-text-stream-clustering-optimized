@@ -102,22 +102,26 @@ list_pred_true_words_index_lockindex=populateNewList(globalList_not_clustered)
 globalList_clustered, globalList_not_clustered=clusterByBatch(4000, list_pred_true_words_index_lockindex, 0.08, 2)
 all_global.extend(globalList_clustered)
 
-list_pred_true_words_index_lockindex=populateNewList(globalList_not_clustered)
-globalList_clustered, globalList_not_clustered=clusterByBatch(4000, list_pred_true_words_index_lockindex, 0.08, 2)
-all_global.extend(globalList_clustered)
-
-
-
-
-
-
-
+#list_pred_true_words_index_lockindex=populateNewList(globalList_not_clustered)
+#globalList_clustered, globalList_not_clustered=clusterByBatch(4000, list_pred_true_words_index_lockindex, 0.08, 2)
+#all_global.extend(globalList_clustered)
 
 Evaluate(all_global)
 print("final total texts=", len(all_global+globalList_not_clustered))
 
+print('-----------------process clusters')
+
+
+
+
+
 later = datetime.now()
 difference = (later - now).total_seconds()  
 print("time diff", difference)	
+
+print('------print_by_group(globalList_clustered, 0)----')
+print_by_group(all_global, 0)
+print('------print_by_group(globalList_not_clustered, 0)----')
+print_by_group(globalList_not_clustered, 1)
 
 

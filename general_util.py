@@ -1,4 +1,5 @@
 from groupTxt_ByClass import groupItemsBySingleKeyIndex
+from nltk.stem import PorterStemmer 
 
 def extractSeenNotClustered(predsSeen_list_pred_true_words_index, sub_list_pred_true_words_index):
   not_clustered_inds_batch=[]
@@ -26,6 +27,7 @@ def Print_list_pred_true_text(listtuple_pred_true_text):
     print(pred_true_text)
 
 def readlistWholeJsonDataSet(datasetName):
+  ps = PorterStemmer()
   file1=open(datasetName,"r")
   lines = file1.readlines()
   file1.close()
@@ -39,7 +41,8 @@ def readlistWholeJsonDataSet(datasetName):
     words=str(n['textCleaned']).strip().split(' ')
     if len(true)==0 or len(words)==0:
       continue
-    i+=1 	  
+    i+=1
+    words=[ps.stem(w) for w in words] 	
     list_pred_true_words_index_lockindex.append([-1, true, words, i, i])
   return list_pred_true_words_index_lockindex
   
