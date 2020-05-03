@@ -7,6 +7,8 @@ from collections import Counter
 from clustering_gram_util import filterClusters
 from clustering_gram_util import assignToClusterBySimilarity
 from clustering_gram_util import assignToClusterSimDistribution
+from clustering_gram_util import assignToClusterBySimilarityClusterRep
+from clustering_gram_util import populateClusterReps
 from evaluation_util import evaluateByGram
 from dictionary_util import combineTwoDictionary
 from word_vec_extractor import extractAllWordVecs
@@ -17,9 +19,11 @@ from read_pred_true_text import ReadPredTrueText
 
 from datetime import datetime
 
-gloveFile = "/home/owner/PhD/dr.norbert/dataset/shorttext/glove.42B.300d/glove.42B.300d.txt"
+embedDim=50
+
+gloveFile = "/home/owner/PhD/dr.norbert/dataset/shorttext/glove.42B.300d/glove.6B.50d.txt"
 wordVectorsDic={}
-#wordVectorsDic = extractAllWordVecs(gloveFile, 300)
+wordVectorsDic = extractAllWordVecs(gloveFile, embedDim)
 
 list_pred_true_words_index_lockindex=readlistWholeJsonDataSet("Tweets") #NTS-mstream, #Tweets, #News
 fileName="News_clusters"
@@ -91,25 +95,32 @@ def clusterByBatch(batchSize, list_pred_true_words_index_lockindex, simThreshold
   return [globalList_clustered, globalList_not_clustered]
 
 
-all_global=[]
+all_global_clustered=[]
 
 now = datetime.now()
 
 globalList_clustered, globalList_not_clustered=clusterByBatch(4000, list_pred_true_words_index_lockindex,0.08, 2)
-all_global.extend(globalList_clustered)
+all_global_clustered.extend(globalList_clustered)
 
 list_pred_true_words_index_lockindex=populateNewList(globalList_not_clustered)
 globalList_clustered, globalList_not_clustered=clusterByBatch(4000, list_pred_true_words_index_lockindex, 0.08, 2)
-all_global.extend(globalList_clustered)
+all_global_clustered.extend(globalList_clustered)
 
 #list_pred_true_words_index_lockindex=populateNewList(globalList_not_clustered)
 #globalList_clustered, globalList_not_clustered=clusterByBatch(4000, list_pred_true_words_index_lockindex, 0.08, 2)
-#all_global.extend(globalList_clustered)
+#all_global_clustered.extend(globalList_clustered)
 
-Evaluate(all_global)
-print("final total texts=", len(all_global+globalList_not_clustered))
+Evaluate(all_global_clustered)
+print("final total texts=", len(all_global_clustered+globalList_not_clustered))
 
-print('-----------------process clusters')
+
+print('-----------------process clusters-----------')
+dic_cluster_rep_words, dic_cluster_rep_vec=populateClusterReps(all_global_clustered, wordVectorsDic, embedDim)
+print(len(dic_cluster_rep_vec))
+globalList_not_clustered=assignToClusterBySimilarityClusterRep(globalList_not_clustered, dic_cluster_rep_words, dic_cluster_rep_vec, wordVectorsDic, embedDim)
+Evaluate(all_global_clustered+globalList_not_clustered)
+print("partial total texts=", len(all_global_clustered+globalList_not_clustered))
+print('-----------------end process clusters-----------')
 
 
 
@@ -119,9 +130,9 @@ later = datetime.now()
 difference = (later - now).total_seconds()  
 print("time diff", difference)	
 
-print('------print_by_group(globalList_clustered, 0)----')
-print_by_group(all_global, 0)
-print('------print_by_group(globalList_not_clustered, 0)----')
-print_by_group(globalList_not_clustered, 1)
+#print('------print_by_group(globalList_clustered, 0)----')
+#print_by_group(all_global_clustered, 0)
+#print('------print_by_group(globalList_not_clustered, 0)----')
+#print_by_group(globalList_not_clustered, 1)
 
 

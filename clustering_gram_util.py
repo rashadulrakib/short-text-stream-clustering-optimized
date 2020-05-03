@@ -7,6 +7,7 @@ from compute_util import computeSimBtnList
 from txt_process_util import commonWordSims_clusterGroup
 from txt_process_util import semanticSims
 from sent_vecgenerator import generate_sent_vecs_toktextdata
+from groupTxt_ByClass import groupItemsBySingleKeyIndex
 
 def removeCommonTxtInds(dic_bitri_keys_selectedClusters_seenBatch):
   dic_txtId_to_grams={}
@@ -416,6 +417,30 @@ def assignToClusterBySimilarity(not_clustered_inds_seen_batch, seen_list_pred_tr
   #print("batch-eval: total_dic_items", total_dic_items)
   return [dic_preds, new_not_clustered_inds_seen_batch]
   
+def assignToClusterBySimilarityClusterRep(globalList_not_clustered, dic_cluster_rep_words, dic_cluster_rep_vec, wordVectorsDic, embedDim):
+  new_globalList_not_clustered=[]
+  
+  for item in globalList_not_clustered:
+    word_arr=item[2]
+    text_vec=generate_sent_vecs_toktextdata([word_arr], wordVectorsDic, embedDim)[0]
+	
+    dic_lex_Sim_CommonWords, maxPredLabel_lex, maxSim_lex, maxCommon_lex, minSim_lex=commonWordSims_clusterGroup(word_arr, dic_cluster_rep_words)
+	
+    dic_semanticSims, maxPredLabel_Semantic, maxSim_Semantic, minSim_semantic=semanticSims(text_vec, dic_cluster_rep_vec)
+		
+    if maxCommon_lex>0 and str(maxPredLabel_lex)==str(maxPredLabel_Semantic):
+      new_pred=str(maxPredLabel_lex)
+      new_globalList_not_clustered.append([new_pred, item[1], word_arr, item[3], item[4]])
+    elif maxCommon_lex>0:
+      new_pred=str(maxPredLabel_lex)
+      new_globalList_not_clustered.append([new_pred, item[1], word_arr, item[3], item[4]])
+	  
+    print(maxCommon_lex, maxPredLabel_lex, maxSim_lex, "semantic", maxPredLabel_Semantic, maxSim_Semantic, word_arr) 	  
+    	
+  
+  return new_globalList_not_clustered
+    
+  
 
 def filterClusters(dictri_keys_selectedClusters_currentBatch, dicbi_keys_selectedClusters_currentBatch, sub_list_pred_true_words_index, seen_list_pred_true_words_index):
   new_dictri_keys_selectedClusters_currentBatch={}
@@ -748,3 +773,52 @@ def populateNgramStatistics(dic_gram_to_textInds, minTxtIndsForNgram=1):
     size_std=statistics.stdev(txtIndsSize)
   
   return [size_std, size_mean, size_max, size_min]
+  
+  
+def populateClusterReps(all_global, wordVectorsDic, embedDim):
+  dic_cluster_rep_words={}
+  dic_cluster_rep_vec={}
+  dic_tupple_class=groupItemsBySingleKeyIndex(all_global, 0)
+  for predKey, items in dic_tupple_class.items():
+    clus_words=[]
+    #can filter some words using word entropy based on clus distributions.	
+    for item in items:
+      words=item[2]
+      clus_words.extend(words)
+	  
+    dic_word_counts=Counter(clus_words)
+    wordCounts=dic_word_counts.values()	
+    mean=0
+    if len(wordCounts)>=1:
+      mean=statistics.mean(wordCounts)
+    std=mean
+    if len(wordCounts)>=2:  
+      std=statistics.stdev(wordCounts)
+    dic_word_counts_filtered={}
+   	
+    for key, counts in dic_word_counts.items():
+      if counts>mean+std:
+        dic_word_counts_filtered[key]=counts  	  
+
+    if len(dic_word_counts_filtered)<=2:
+      dic_word_counts_filtered={}
+      for key, counts in dic_word_counts.items():
+        if counts>1:	  
+          dic_word_counts_filtered[key]=counts
+      #if len(dic_word_counts_filtered)<=2:
+      #  dic_word_counts_filtered={}
+      #  for key, counts in dic_word_counts.items():
+      #    dic_word_counts_filtered[key]=counts		
+   
+       
+    clus_words=list(dic_word_counts_filtered.keys())
+    clus_word_counts=list(dic_word_counts_filtered.values())    	
+    cent_Vec_words=generate_sent_vecs_toktextdata([clus_words], wordVectorsDic, embedDim)[0]	     	
+	
+    dic_cluster_rep_words[predKey]=[dic_word_counts_filtered, sum(clus_word_counts)] 
+    dic_cluster_rep_vec[predKey]=cent_Vec_words	
+    
+    #print(dic_cluster_rep_words[predKey])		
+    #print(dic_cluster_rep_vec[predKey])	
+  
+  return [dic_cluster_rep_words, dic_cluster_rep_vec]  

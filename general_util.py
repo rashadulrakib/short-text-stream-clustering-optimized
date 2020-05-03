@@ -47,6 +47,7 @@ def readlistWholeJsonDataSet(datasetName):
   return list_pred_true_words_index_lockindex
   
 def readDicWholeJsonDataSet(datasetName):
+  ps = PorterStemmer() 
   file1=open(datasetName,"r")
   lines = file1.readlines()
   file1.close()
@@ -58,6 +59,10 @@ def readDicWholeJsonDataSet(datasetName):
     true=str(n['clusterNo']).strip()
     words=str(n['textCleaned']).strip().split(' ')
     if len(true)==0 or len(words)==0:
-      continue 	
+      continue
+    words=[ps.stem(w) for w in words] 		  
     dic_id_trueWords[id]=[true, words]
   return dic_id_trueWords
+  
+
+  
