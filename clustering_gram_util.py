@@ -422,20 +422,27 @@ def assignToClusterBySimilarityClusterRep(globalList_not_clustered, dic_cluster_
   
   for item in globalList_not_clustered:
     word_arr=item[2]
-    text_vec=generate_sent_vecs_toktextdata([word_arr], wordVectorsDic, embedDim)[0]
+    #text_vec=generate_sent_vecs_toktextdata([word_arr], wordVectorsDic, embedDim)[0]
 	
     dic_lex_Sim_CommonWords, maxPredLabel_lex, maxSim_lex, maxCommon_lex, minSim_lex=commonWordSims_clusterGroup(word_arr, dic_cluster_rep_words)
 	
-    dic_semanticSims, maxPredLabel_Semantic, maxSim_Semantic, minSim_semantic=semanticSims(text_vec, dic_cluster_rep_vec)
+    if maxSim_lex<0.5:
+      continue      	
+	
+    #dic_semanticSims, maxPredLabel_Semantic, maxSim_Semantic, minSim_semantic=semanticSims(text_vec, dic_cluster_rep_vec)
 		
-    if maxCommon_lex>0 and str(maxPredLabel_lex)==str(maxPredLabel_Semantic):
-      new_pred=str(maxPredLabel_lex)
-      new_globalList_not_clustered.append([new_pred, item[1], word_arr, item[3], item[4]])
-    elif maxCommon_lex>0:
-      new_pred=str(maxPredLabel_lex)
-      new_globalList_not_clustered.append([new_pred, item[1], word_arr, item[3], item[4]])
+    #if maxCommon_lex>0 and str(maxPredLabel_lex)==str(maxPredLabel_Semantic):
+    #  new_pred=str(maxPredLabel_lex)
+    #  new_globalList_not_clustered.append([new_pred, item[1], word_arr, item[3], item[4]])
+    #elif maxCommon_lex>0:
+    #  new_pred=str(maxPredLabel_lex)
+    #  new_globalList_not_clustered.append([new_pred, item[1], word_arr, item[3], item[4]])
 	  
-    print(maxCommon_lex, maxPredLabel_lex, maxSim_lex, "semantic", maxPredLabel_Semantic, maxSim_Semantic, word_arr) 	  
+    #print(maxCommon_lex, maxPredLabel_lex, maxSim_lex, "semantic", maxPredLabel_Semantic, maxSim_Semantic, word_arr)
+
+    new_globalList_not_clustered.append([maxPredLabel_lex, item[1], word_arr, item[3], item[4]])	
+	
+    print(dic_cluster_rep_words[maxPredLabel_lex], maxCommon_lex, maxPredLabel_lex, maxSim_lex, item[1], word_arr)	
     	
   
   return new_globalList_not_clustered

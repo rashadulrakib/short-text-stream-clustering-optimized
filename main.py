@@ -23,7 +23,7 @@ embedDim=50
 
 gloveFile = "/home/owner/PhD/dr.norbert/dataset/shorttext/glove.42B.300d/glove.6B.50d.txt"
 wordVectorsDic={}
-wordVectorsDic = extractAllWordVecs(gloveFile, embedDim)
+#wordVectorsDic = extractAllWordVecs(gloveFile, embedDim)
 
 list_pred_true_words_index_lockindex=readlistWholeJsonDataSet("Tweets") #NTS-mstream, #Tweets, #News
 fileName="News_clusters"
@@ -119,7 +119,8 @@ dic_cluster_rep_words, dic_cluster_rep_vec=populateClusterReps(all_global_cluste
 print(len(dic_cluster_rep_vec))
 globalList_not_clustered=assignToClusterBySimilarityClusterRep(globalList_not_clustered, dic_cluster_rep_words, dic_cluster_rep_vec, wordVectorsDic, embedDim)
 Evaluate(all_global_clustered+globalList_not_clustered)
-print("partial total texts=", len(all_global_clustered+globalList_not_clustered))
+print("partial total texts=", len(globalList_not_clustered))
+Evaluate(globalList_not_clustered)
 print('-----------------end process clusters-----------')
 
 
@@ -130,8 +131,8 @@ later = datetime.now()
 difference = (later - now).total_seconds()  
 print("time diff", difference)	
 
-#print('------print_by_group(globalList_clustered, 0)----')
-#print_by_group(all_global_clustered, 0)
+print('------print_by_group(globalList_clustered, 0)----')
+print_by_group(globalList_not_clustered, 0)
 #print('------print_by_group(globalList_not_clustered, 0)----')
 #print_by_group(globalList_not_clustered, 1)
 
